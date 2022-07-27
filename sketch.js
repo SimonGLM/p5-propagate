@@ -13,7 +13,7 @@ let nAPD = 0;
 let nAngle = 0;
 let iterDepth = 30;
 let debugAngle = 15;
-let criticalAngle = 45;
+let criticalAngle = 27.44;
 let scale = 4;
 let slider;
 let button;
@@ -52,10 +52,12 @@ function setup() {
   slider = createSlider(1, 199, X0);
   slider.position(10, 195);
   slider.style('width', '150px');
-  A = createVector(100 * scale, 15 * scale)
-  B = createVector(-100 * scale, 15 * scale)
-  C = createVector(-100 * scale, -15 * scale)
-  D = createVector(100 * scale, -10 * scale)
+  let BF = 21.28
+  let BR = 28.75
+  A = createVector(100 * scale, BR / 2 * scale)
+  B = createVector(-100 * scale, BR / 2 * scale)
+  C = createVector(-100 * scale, -BR / 2 * scale)
+  D = createVector(100 * scale, BF - BR / 2 * scale)
   crystal = new Crystal(A, B, C, D);
 
   for (let a = 1; a <= nRays; a += 1) {
