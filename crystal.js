@@ -7,8 +7,9 @@ class Crystal {
   }
 
   show() {
-    for (let wall of this.walls) {
-      wall.show();
-    }
+    this.walls[0].show();
+    this.walls[2].show();
+    this.walls[3].show();
+    this.walls[1].show(128, 255, 255, 5);
   }
 }

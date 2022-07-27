@@ -5,25 +5,23 @@
 // 2D Ray Casting
 
 class Ray {
-  constructor(pos, dir, traveled = 0, lastBounce = null) {
+  constructor(pos, dir, lastBounce = null) {
     this.pos = pos;
     this.dir = dir;
-    this.traveled = traveled;
+    this.len = 0;
     this.lastBounce = lastBounce;
   }
 
-  lookAt(x, y) {
-    this.dir.x = x - this.pos.x;
-    this.dir.y = y - this.pos.y;
-    this.dir.normalize();
-  }
-
   show() {
-    stroke(255);
-    push();
-    translate(this.pos.x, this.pos.y);
-    line(0, 0, this.dir.x * 25, this.dir.y * 25);
-    pop();
+    push()
+    fill('red')
+    stroke('red')
+    strokeWeight(3)
+    ellipse(this.pos.x, this.pos.y, 10)
+    line(this.pos.x, this.pos.y, this.pos.x + this.dir.x * 30, this.pos.y + this.dir.y * 30)
+    stroke('green')
+    line(this.pos.x, this.pos.y, this.pos.x + this.lastBounce.norm().x * 30, this.pos.y + this.lastBounce.norm().y * 30)
+    pop()
   }
 
   myreflect(walls) {
@@ -32,7 +30,6 @@ class Ray {
     let normal;
     let bounce;
     for (let wall of walls) {
-      // console.log("ray", this, "wall:", wall, "cond:", wall == this.lastBounce)
       if (wall == this.lastBounce)
         continue
       const pt = this.intersect(wall);
@@ -40,17 +37,18 @@ class Ray {
         bounce = wall;
         const d = p5.Vector.dist(this.pos, pt);
         if (d < record) {
-          record = d;  //useless
+          record = d;
           closest = pt;
-          normal = wall.normal()
+          normal = wall.norm()
         }
       }
     }
-    if (closest) {
-      let newRay = new Ray(closest, this.dir, this.traveled + record, bounce);
+    if (closest) { //found pt where ray intersects first
+      this.len = this.pos.dist(closest)
+      let newRay = new Ray(closest, this.dir.copy(), bounce);
       newRay.dir.reflect(normal);
       return newRay;
-    } else { return null }
+    } else { throw "No intersection with boundary" }
   }
 
 

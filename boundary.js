@@ -10,14 +10,18 @@ class Boundary {
     this.b = createVector(x2, y2);
   }
 
-  show() {
-    stroke(255);
+  show(H = 0, S = 0, B = 255, weight = 3) {
+    push()
+    colorMode(HSB, 255)
+    stroke(H, S, B)
+    strokeWeight(weight)
     line(this.a.x, this.a.y, this.b.x, this.b.y);
+    pop()
   }
 
-  normal() {
+  norm() {
     let vecx = this.a.x - this.b.x
     let vecy = this.a.y - this.b.y
-    return createVector(-vecy, vecx)
+    return createVector(vecy, -vecx).normalize()
   }
 }

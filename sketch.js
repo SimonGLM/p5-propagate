@@ -5,57 +5,113 @@
 // 2D Ray Casting
 
 let crystal;
+let X0 = 50;
 let paths = [];
-let lamp;
 let A, B, C, D;
-let xoff = 0;
-let yoff = 10000;
-let iterDepth = 10;
+let nRays = 100000;
+let nAPD = 0;
+let nAngle = 0;
+let iterDepth = 30;
+let debugAngle = 15;
+let criticalAngle = 45;
 let scale = 4;
+let slider;
+let button;
 
 function processRay(ray, walls) {
-  let newRay = ray.myreflect(walls)
-  // console.log("newRay", newRay)
-
-  if (newRay) {
-    return newRay
-  } else {
-    console.log("Ray did not bounce on wall", ray)
+  if (ray == null)
+    return null
+  if (ray.lastBounce == crystal.walls[1]) {
+    nAPD += 1
     return null
   }
+  let newRay = ray.myreflect(walls)
+  if (!newRay)
+    throw "No newRay created"
+
+  if (ray.lastBounce) {
+    // console.log(ray.dir.angleBetween(ray.lastBounce.norm()))
+    if (abs(ray.dir.angleBetween(ray.lastBounce.norm())) < radians(criticalAngle)) {// left crystal
+      nAngle += 1;
+      return null
+    }
+  }
+  return newRay
 }
 
 function setup() {
+  if (nRays * iterDepth > 1e3) {
+    console.log("Restricting framerate to 5")
+    frameRate(5)
+  }
+
   createCanvas(windowWidth, windowHeight);
-  // frameRate(1)
-  A = createVector(100 * scale, -10 * scale)
-  B = createVector(-100 * scale, -15 * scale)
-  C = createVector(-100 * scale, 15 * scale)
-  D = createVector(100 * scale, 15 * scale)
+  button = createButton('recalculate')
+  button.position(10, 270)
+  button.mousePressed(recalculate)
+  slider = createSlider(1, 199, X0);
+  slider.position(10, 195);
+  slider.style('width', '150px');
+  A = createVector(100 * scale, 15 * scale)
+  B = createVector(-100 * scale, 15 * scale)
+  C = createVector(-100 * scale, -15 * scale)
+  D = createVector(100 * scale, -10 * scale)
   crystal = new Crystal(A, B, C, D);
 
-  for (let a = 1; a <= 360; a += 36) {
+  for (let a = 1; a <= nRays; a += 1) {
     let p = new Path(1e6);
-    p.rays.push(new Ray(createVector(0, 0), p5.Vector.fromAngle(radians(a))));
+    p.append(new Ray(createVector((X0 - 100) * scale, 0), p5.Vector.fromAngle(radians(a / nRays * 360))));
     paths.push(p);
   }
-  for (let i = 0; i < iterDepth; i += 1) {
+  for (let i = 0; i <= iterDepth; i += 1) {
     for (let path of paths) {
       // console.log(path.rays.slice(-1)[0])
-      path.rays.push(processRay(path.rays.slice(-1)[0], crystal.walls))
+      path.append(processRay(path.rays.slice(-1)[0], crystal.walls))
     }
   }
+  for (let path of paths)
+    path.len()
+}
 
+function recalculate() {
+  X0 = slider.value()
+  slider.remove()
+  delete paths
+  button.remove()
+  delete button
+  button = null
+  delete slider
+  slider = null
+  paths = []
+  nAPD = 0
+  nAngle = 0
+  setup()
 }
 
 function draw() {
+  X0 = slider.value()
   background(0);
+  textSize(16);
+  stroke(0)
+  fill(255)
+  text(`FPS: ${frameRate().toFixed(1)}`, 10, 30)
+  text(`iterations: ${iterDepth}`, 10, 60)
+  text(`nRays: ${nRays}`, 10, 90)
+  text(`nAPD: ${nAPD}`, 10, 120)
+  text(`nAngle: ${nAngle}`, 10, 150)
+  text(`nDangling: ${nRays - nAPD - nAngle}`, 10, 180)
+  text(`xPosition: ${slider.value()}`, 10, 240)
   translate(width / 2, height / 2)
+
+  for (let i = 0; i < paths.length; i += 1) {
+    let path = paths[i]
+    if (i % 100 == 0)
+      path.show()
+  }
   crystal.show();
-  for (let path of paths)
-    path.show()
-  // for (let i = 0; i < iterDepth; i += 1) {
-  //   rays.push(propagator.rays)
-  //   propagator.rays[0] = propagator.processRay(propagator.rays[0], crystal.walls);
-  // }
+  push()
+  strokeWeight(8)
+  stroke('red')
+  point((X0 - 100) * scale, 0)
+  pop()
 }
