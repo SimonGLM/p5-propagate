@@ -44,8 +44,9 @@ class Ray {
       }
     }
     if (closest) { //found pt where ray intersects first
-      this.len = this.pos.dist(closest)
       let newRay = new Ray(closest, this.dir.copy(), bounce);
+      this.len = this.pos.dist(closest)
+      newRay.len = this.pos.dist(closest)
       newRay.dir.reflect(normal);
       return newRay;
     } else { throw "No intersection with boundary" }

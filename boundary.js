@@ -10,10 +10,10 @@ class Boundary {
     this.b = createVector(x2, y2);
   }
 
-  show(H = 0, S = 0, B = 255, weight = 3) {
+  show(R = 255, G = 255, B = 255, weight = 3) {
     push()
-    colorMode(HSB, 255)
-    stroke(H, S, B)
+    colorMode(RGB, 255)
+    stroke(R, G, B)
     strokeWeight(weight)
     line(this.a.x, this.a.y, this.b.x, this.b.y);
     pop()

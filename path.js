@@ -6,24 +6,29 @@ class Path {
   }
 
   append(ray) {
+    if (ray)
+      this.pathLength += ray.len
     this.rays.push(ray)
   }
 
-  len() {
-    this.pathLength = 0
-    for (let ray of this.rays) {
-      if (!ray)
-        continue
-      this.pathLength += ray.len
-    }
-    return this.pathLength
-  }
+  // len() {
+  //   this.pathLength = 0
+  //   for (let ray of this.rays) {
+  //     if (!ray)
+  //       continue
+  //     this.pathLength += ray.len
+  //   }
+  //   return this.pathLength
+  // }
 
   show() {
     push()
-    colorMode(HSB, 4000, 255, 255, 255);
+    colorMode(RGB);
+    let from = color(0, 3, 255, 64)
+    let to = color(145, 254, 21, 64)
+
     strokeWeight(2)
-    stroke(this.pathLength, 255, 255, 64);
+    stroke(lerpColor(from, to, this.pathLength / 2000));
     for (let i = 1; i < this.rays.length; i += 1) {
       if (this.rays[i] == null)
         continue

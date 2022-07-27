@@ -8,13 +8,13 @@ let crystal;
 let X0 = 50;
 let paths = [];
 let A, B, C, D;
-let nRays = 100000;
+let nRays = 1000;
 let nAPD = 0;
 let nAngle = 0;
 let iterDepth = 30;
 let debugAngle = 15;
 let criticalAngle = 27.44;
-let scale = 4;
+let scale = 6;
 let slider;
 let button;
 
@@ -67,12 +67,9 @@ function setup() {
   }
   for (let i = 0; i <= iterDepth; i += 1) {
     for (let path of paths) {
-      // console.log(path.rays.slice(-1)[0])
       path.append(processRay(path.rays.slice(-1)[0], crystal.walls))
     }
   }
-  for (let path of paths)
-    path.len()
 }
 
 function recalculate() {
@@ -105,9 +102,10 @@ function draw() {
   text(`xPosition: ${slider.value()}`, 10, 240)
   translate(width / 2, height / 2)
 
+  paths.sort((a, b) => { return -a.pathLength + b.pathLength })
   for (let i = 0; i < paths.length; i += 1) {
     let path = paths[i]
-    if (i % 100 == 0)
+    if (i % (nRays / 1000) < 1)
       path.show()
   }
   crystal.show();
