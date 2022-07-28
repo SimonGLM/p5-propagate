@@ -20,7 +20,8 @@ class Ray {
     ellipse(this.pos.x, this.pos.y, 10)
     line(this.pos.x, this.pos.y, this.pos.x + this.dir.x * 30, this.pos.y + this.dir.y * 30)
     stroke('green')
-    line(this.pos.x, this.pos.y, this.pos.x + this.lastBounce.norm().x * 30, this.pos.y + this.lastBounce.norm().y * 30)
+    if (this.lastBounce)
+      line(this.pos.x, this.pos.y, this.pos.x + this.lastBounce.norm().x * 30, this.pos.y + this.lastBounce.norm().y * 30)
     pop()
   }
 

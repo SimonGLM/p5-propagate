@@ -6,6 +6,14 @@ class Crystal {
     new Boundary(p4.x, p4.y, p1.x, p1.y)]
   }
 
+  getWidth(x) {
+    // [mm]
+    let angle = Math.atan((BF - BR) / 200)
+    let drop = abs(Math.tan(angle) * x)
+    return BR - drop
+
+  }
+
   show() {
     this.walls[0].show();
     this.walls[2].show();

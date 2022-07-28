@@ -5,14 +5,17 @@
 // 2D Ray Casting
 
 let crystal;
-let X0 = 50;
+let X0 = 1;
 let paths = [];
 let A, B, C, D;
+let BF = 21.28
+let BR = 28.75
 let nRays = 1000;
 let nAPD = 0;
 let nAngle = 0;
-let iterDepth = 30;
-let debugAngle = 15;
+let nAbsorbed = 0;
+let iterDepth = 100;
+let debugAngle = -47;
 let criticalAngle = 27.44;
 let scale = 6;
 let slider;
@@ -47,22 +50,20 @@ function setup() {
 
   createCanvas(windowWidth, windowHeight);
   button = createButton('recalculate')
-  button.position(10, 270)
+  button.position(10, 300)
   button.mousePressed(recalculate)
   slider = createSlider(1, 199, X0);
-  slider.position(10, 195);
+  slider.position(10, 225);
   slider.style('width', '150px');
-  let BF = 21.28
-  let BR = 28.75
   A = createVector(100 * scale, BR / 2 * scale)
   B = createVector(-100 * scale, BR / 2 * scale)
   C = createVector(-100 * scale, -BR / 2 * scale)
-  D = createVector(100 * scale, BF - BR / 2 * scale)
+  D = createVector(100 * scale, -(BF - BR / 2) * scale)
   crystal = new Crystal(A, B, C, D);
 
   for (let a = 1; a <= nRays; a += 1) {
-    let p = new Path(1e6);
-    p.append(new Ray(createVector((X0 - 100) * scale, 0), p5.Vector.fromAngle(radians(a / nRays * 360))));
+    let p = new Path(3e3);
+    p.append(new Ray(createVector((X0 - 100) * scale, (BR - crystal.getWidth(X0)) / 2 * scale), p5.Vector.fromAngle(radians(a / nRays * 360)))); //
     paths.push(p);
   }
   for (let i = 0; i <= iterDepth; i += 1) {
@@ -98,8 +99,9 @@ function draw() {
   text(`nRays: ${nRays}`, 10, 90)
   text(`nAPD: ${nAPD}`, 10, 120)
   text(`nAngle: ${nAngle}`, 10, 150)
-  text(`nDangling: ${nRays - nAPD - nAngle}`, 10, 180)
-  text(`xPosition: ${slider.value()}`, 10, 240)
+  text(`nAbsorbed: ${nAbsorbed}`, 10, 180)
+  text(`nDangling: ${nRays - nAPD - nAngle - nAbsorbed}`, 10, 210)
+  text(`xPosition: ${slider.value()}`, 10, 270)
   translate(width / 2, height / 2)
 
   paths.sort((a, b) => { return -a.pathLength + b.pathLength })
@@ -112,6 +114,6 @@ function draw() {
   push()
   strokeWeight(8)
   stroke('red')
-  point((X0 - 100) * scale, 0)
+  point((X0 - 100) * scale, (BR - crystal.getWidth(X0)) / 2 * scale)
   pop()
 }
