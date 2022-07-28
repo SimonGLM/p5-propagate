@@ -1,0 +1,17 @@
+#ifndef RAY_WALK_CONFIG_H
+#define RAY_WALK_CONFIG_H
+// the configured options and settings for the program
+// options are getting copied to raywalkconfig.h using cmake variables
+// defined in cmake/ray_walk.cmake
+///author: Marvin
+#define PROJECT_NAME "@PROJECT_NAME@"
+#define project_VERSION_MAJOR @ray_walk_VERSION_MAJOR@
+#define project_VERSION_MINOR @ray_walk_VERSION_MINOR@
+#define HAVE_UNISTD_H @HAVE_UNISTD_H@
+#define HAVE_DIRENT_H @HAVE_DIRENT_H@
+#define HAVE_WINDOWS_H @HAVE_WINDOWS_H@
+#define HAVE_FENVV_H @HAVE_FENV_H@
+#define HAVE_OPENMP @HAVE_OPENMP@
+#define ON_LINUX @ON_LINUX@
+#define HAVE_CUDA @HAVE_CUDA@
+#endif // RAY_WALK_CONFIG_H

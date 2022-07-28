@@ -1,0 +1,2 @@
+class boundary;
+class ray;
