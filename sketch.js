@@ -43,6 +43,7 @@ function processRay(ray, walls) {
 }
 
 function setup() {
+  console.log(('b' + 'a' + + 'a' + 'a').toLowerCase());
   if (nRays * iterDepth > 1e3) {
     console.log("Restricting framerate to 5")
     frameRate(5)
