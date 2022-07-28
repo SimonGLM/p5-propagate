@@ -1,17 +1,21 @@
 set(RAY_WALK_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(RAY_WALK_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
-set(RAY_WALK_SRC_FILES 
+set(RAY_WALK_SRC_FILES
     "${RAY_WALK_SRC_DIR}/main.cpp"
     "${RAY_WALK_SRC_DIR}/cmdlineparser.cpp"
+    "${RAY_WALK_SRC_DIR}/world.cpp"
     "${RAY_WALK_SRC_DIR}/boundary.cpp"
     "${RAY_WALK_SRC_DIR}/ray.cpp"
+    "${RAY_WALK_SRC_DIR}/path.cpp"
 )
 set(RAY_WALK_HEADER_FILES
     "${RAY_WALK_INCLUDE_DIR}/forward_declarations.h"
     "${RAY_WALK_INCLUDE_DIR}/raywalkconfig.h"
     "${RAY_WALK_INCLUDE_DIR}/cmdlineparser.h"
+    "${RAY_WALK_INCLUDE_DIR}/world.h"
     "${RAY_WALK_INCLUDE_DIR}/boundary.h"
     "${RAY_WALK_INCLUDE_DIR}/ray.h"
+    "${RAY_WALK_INCLUDE_DIR}/path.h"
 )
 
 set(Eigen3_DIR "/home/marvin/eigen-3.4.0/build")

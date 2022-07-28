@@ -2,22 +2,38 @@
 #define RAY_H
 
 #include "forward_declarations.h"
+#include "aliases.h"
 #include <Eigen/Dense>
 #include <memory>
 
 class ray
 {
 public:
-    ray(const Eigen::Vector2i &f_start, const Eigen::Vector2i &f_direction);
-    auto start() const -> Eigen::Vector2i;
-    auto direction() const -> Eigen::Vector2i;
-    auto intersect(const boundary &wall) -> Eigen::Vector2i;
+    ray(const vector2 &f_start, const vector2 &f_direction, std::shared_ptr<boundary> f_last_bounce = nullptr);
+
+    /**
+     * @brief Returns the origin point of a ray
+     *
+     * @return vector2
+     */
+    auto start() const -> vector2;
+
+    /**
+     * @brief Returns the direction vector of a ray
+     *
+     * @return vector2
+     */
+    auto direction() const -> vector2;
+
+    auto as_line() const -> line;
+
+    auto last_bounce() const -> std::shared_ptr<boundary>;
 
 private:
-    Eigen::Vector2i m_start;
-    Eigen::Vector2i m_direction;
-    // Eigen::Hyperplane<int, 2> line; // in 2D a Hyperplane is a line.
-    std::shared_ptr<boundary> last_bounce{nullptr};
+    vector2 m_start;
+    vector2 m_direction;
+    std::shared_ptr<vector2> m_end{nullptr};
+    std::shared_ptr<boundary> m_last_bounce;
 };
 
 #endif // RAY_H

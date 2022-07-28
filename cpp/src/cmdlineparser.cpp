@@ -18,7 +18,8 @@ void cmd_line_parser::print_help()
     std::cout << "  -V <unsigned>           : sets verbosity level." << std::endl;
     std::cout << std::endl;
     std::cout << "written by <marvin.peter@physik.uni-giessen.de>" << std::endl;
-    std::cout << "---status (compiled) " << __DATE__ << " " << __TIME__ << std::endl << std::endl;
+    std::cout << "---status (compiled) " << __DATE__ << " " << __TIME__ << std::endl
+              << std::endl;
 
 } // end of print_help()
 
