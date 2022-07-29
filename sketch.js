@@ -5,7 +5,7 @@
 // 2D Ray Casting
 
 let crystal;
-let X0 = 1;
+let X0 = 100;
 let paths = [];
 let A, B, C, D;
 let BF = 21.28
@@ -20,12 +20,17 @@ let criticalAngle = 27.44;
 let scale = 6;
 let slider;
 let button;
+let pathstodraw;
+let shortest;
+let longest;
 
-function processRay(ray, walls) {
+function processRay(path, walls) {
+  let ray = path.rays.slice(-1)[0]
   if (ray == null)
     return null
   if (ray.lastBounce == crystal.walls[1]) {
     nAPD += 1
+    path.absorbedBy = 'APD'
     return null
   }
   let newRay = ray.myreflect(walls)
@@ -36,6 +41,7 @@ function processRay(ray, walls) {
     // console.log(ray.dir.angleBetween(ray.lastBounce.norm()))
     if (abs(ray.dir.angleBetween(ray.lastBounce.norm())) < radians(criticalAngle)) {// left crystal
       nAngle += 1;
+      path.absorbedBy = 'Wrapping'
       return null
     }
   }
@@ -43,11 +49,10 @@ function processRay(ray, walls) {
 }
 
 function setup() {
-  console.log(('b' + 'a' + + 'a' + 'a').toLowerCase());
-  if (nRays * iterDepth > 1e3) {
-    console.log("Restricting framerate to 5")
-    frameRate(5)
-  }
+  // if (nRays * iterDepth > 1e5) {
+  // console.log("Restricting framerate to 5")
+  frameRate(5)
+  // }
 
   createCanvas(windowWidth, windowHeight);
   button = createButton('recalculate')
@@ -69,13 +74,16 @@ function setup() {
   }
   for (let i = 0; i <= iterDepth; i += 1) {
     for (let path of paths) {
-      path.append(processRay(path.rays.slice(-1)[0], crystal.walls))
+      path.append(processRay(path, crystal.walls))
     }
   }
 }
 
-function recalculate() {
-  X0 = slider.value()
+function recalculate(x = -1) {
+  if (x == -1)
+    X0 = slider.value()
+  else
+    X0 = x
   slider.remove()
   delete paths
   button.remove()
@@ -86,17 +94,28 @@ function recalculate() {
   paths = []
   nAPD = 0
   nAngle = 0
+  pathstodraw = null
   setup()
+}
+
+function sample(N) {
+
+  console.log("X, nRays, nAPD, nAngle, ratio")
+  for (let i = 0; i < N; i += 1) {
+    let x = map(i, 0, N, 1, 199)
+    recalculate(x)
+    console.log(x, ", ", nRays, ", ", nAPD, ", ", nAngle, ", ", nAPD / nRays)
+  }
 }
 
 function draw() {
   X0 = slider.value()
-  background(0);
+  background(128);
   textSize(16);
   stroke(0)
   fill(255)
   text(`FPS: ${frameRate().toFixed(1)}`, 10, 30)
-  text(`iterations: ${iterDepth}`, 10, 60)
+  text(`iteration limit: ${iterDepth}`, 10, 60)
   text(`nRays: ${nRays}`, 10, 90)
   text(`nAPD: ${nAPD}`, 10, 120)
   text(`nAngle: ${nAngle}`, 10, 150)
@@ -105,16 +124,38 @@ function draw() {
   text(`xPosition: ${slider.value()}`, 10, 270)
   translate(width / 2, height / 2)
 
-  paths.sort((a, b) => { return -a.pathLength + b.pathLength })
-  for (let i = 0; i < paths.length; i += 1) {
-    let path = paths[i]
-    if (i % (nRays / 1000) < 1)
-      path.show()
+  if (!pathstodraw) { // suffle once per recalculation
+    let consider = paths//paths.filter(path => path.absorbedBy == 'APD')
+    if (nRays > 2000)
+      pathstodraw = getRandomSubarray(consider, 2000)
+    else
+      pathstodraw = paths
+    pathstodraw.sort((a, b) => { return -a.pathLength + b.pathLength })
   }
+  shortest = pathstodraw.slice(-1)[0]
+  longest = pathstodraw[0]
+  for (let path of pathstodraw)
+    path.show()
+  // for (let i = 0; i < paths.length; i += 1) {
+  //   let path = paths[i]
+  //   if (i % (nRays / 1000) < 1)
+  //     path.show()
+  // }
   crystal.show();
   push()
   strokeWeight(8)
-  stroke('red')
+  stroke('lightblue')
   point((X0 - 100) * scale, (BR - crystal.getWidth(X0)) / 2 * scale)
   pop()
+}
+
+function getRandomSubarray(arr, size) {
+  var shuffled = arr.slice(0), i = arr.length, temp, index;
+  while (i--) {
+    index = Math.floor((i + 1) * Math.random());
+    temp = shuffled[index];
+    shuffled[index] = shuffled[i];
+    shuffled[i] = temp;
+  }
+  return shuffled.slice(0, size);
 }
