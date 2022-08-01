@@ -18,7 +18,7 @@ set(RAY_WALK_HEADER_FILES
     "${RAY_WALK_INCLUDE_DIR}/path.h"
 )
 
-set(Eigen3_DIR "/home/marvin/eigen-3.4.0/build")
+set(Eigen3_DIR "/home/user/eigen-3.4.0/build")
 include("${Eigen3_DIR}/../cmake/UseEigen3.cmake")
 
 add_executable(ray_walk ${RAY_WALK_SRC_FILES} ${COMMON_FILES_SRC_DIR})

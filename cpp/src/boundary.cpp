@@ -1,6 +1,7 @@
 #include "boundary.h"
 #include "ray.h"
 #include "aliases.h"
+#include "world.h"
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
 #include <iostream>
@@ -34,8 +35,11 @@ auto boundary::reflect(const ray &inc_ray) -> vector2
 auto boundary::reflect(const vector2 &vec) -> vector2
 {
     auto wall_norm = normal();
+
+    vector2 ref{vec - wall_norm * (2 * (wall_norm.transpose() * vec))};
+
     // be aware that in Eigen, it is only possible to implicitly convert from 1x1 matrix to scalar in one direction (weird)
-    return (wall_norm * (2 * (wall_norm.transpose() * vec)) - vec);
+    return ref;
 }
 
 auto boundary::as_line() const -> line

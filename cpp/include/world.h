@@ -15,7 +15,7 @@ public:
      * @param f_boundaries
      * @return vector2
      */
-    static auto find_closest_intersect(const ray &f_ray, const std::vector<boundary> &f_boundaries) -> vector2;
+    static auto find_closest_intersect(const ray &f_ray, const std::vector<boundary> &f_boundaries) -> std::pair<vector2, boundary>;
 
     /**
      * @brief Returns the intersection point of a ray with a wall
