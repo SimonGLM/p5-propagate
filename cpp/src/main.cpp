@@ -18,19 +18,19 @@ int main(int argc, char **argv)
     omp_set_num_threads(omp_get_max_threads());
     std::vector<double> times(omp_get_max_threads(), 0.);
 
-    constexpr std::size_t n_rays{1000};
+    constexpr std::size_t n_rays{1};
 
     // create walls
-    float scale = 4.;
+    float scale{4.};
     float BF{21.28};
     float BR{28.75};
-    vector2 A{100 * scale, BR / 2 * scale};
+    vector2 A{100 * scale, (BF - BR / 2)  * scale};
     vector2 B{-100 * scale, BR / 2 * scale};
     vector2 C{-100 * scale, -BR / 2 * scale};
-    vector2 D{100 * scale, BF - BR / 2 * scale};
+    vector2 D{100 * scale, -BR / 2 * scale};
 
     std::vector<boundary> crystal{{boundary{A, B},
-                                   boundary{B, C},
+                                   boundary{B, C, true},
                                    boundary{C, D},
                                    boundary{D, A}}};
     for (auto b : crystal){
@@ -39,7 +39,8 @@ int main(int argc, char **argv)
 
     std::vector<path> paths{};
     for (auto i = std::size_t{0}; i < n_rays; i++){
-        paths.push_back(path{ray{vector2{0, 0}, static_cast<float>(i / static_cast<float>(n_rays) * 360.)}});
+        paths.push_back(path{ray{vector2{0, 0}, static_cast<float>(135.)}});
+        // paths.push_back(path{ray{vector2{0, 0}, static_cast<float>(i / static_cast<float>(n_rays) * 360.)}});
     }
 
 #pragma omp parallel for
@@ -59,19 +60,13 @@ int main(int argc, char **argv)
         std::cout << "Thread " << i << " " << static_cast<int>(times[i]*1e6) << " µs\n";
     }
 
-    // for (auto p : paths){
-    //     std::cout << p.n_bounces() << " ";
-    // }
-    // std::cout << "\n";
-    // for (auto p : paths){
-    //     std::cout << p.length() << " ";
-    // }
     std::cout << "\n";
     unsigned hits{};
     for (auto p : paths){
         if (p.termination() != nullptr && (*p.termination())==boundary{B,C}){
             hits++;
         }
+        std::cout << p.debug_str(std::numeric_limits<std::size_t>::max());
     }
     std::cout << hits << " out of " << n_rays << " reached the APD" << std::endl;
     // std::cout << "\n";

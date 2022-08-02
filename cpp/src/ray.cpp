@@ -12,7 +12,7 @@ ray::ray(const vector2 &f_start, float angle, std::shared_ptr<boundary> f_last_b
     : m_start{std::move(f_start)}, m_last_bounce{f_last_bounce}
 {
     Eigen::Rotation2D<float> rotation{angle * (M_PI / 180)};
-    vector2 f_direction{0, 1};
+    vector2 f_direction{1, 0};
     m_direction = rotation * f_direction;
 }
 

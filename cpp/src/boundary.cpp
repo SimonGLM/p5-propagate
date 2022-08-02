@@ -15,8 +15,8 @@ float random_float(float a, float b)
     return a + r;
 }
 
-boundary::boundary(const vector2 &f_a, const vector2 &f_b)
-    : m_a{std::move(f_a)}, m_b{std::move(f_b)} {}
+boundary::boundary(const vector2 &f_a, const vector2 &f_b, bool f_is_absorbing)
+    : m_a{std::move(f_a)}, m_b{std::move(f_b)}, m_is_absorbing{f_is_absorbing} {}
 
 auto boundary::normal() const -> vector2
 {
@@ -43,6 +43,9 @@ auto boundary::reflect(const ray &inc_ray) -> vector2
 
 auto boundary::reflect(const vector2 &vec) -> vector2
 {
+    if (m_is_absorbing){
+        return invalid_vector;
+    }
     auto wall_norm = normal();
 
     // angle in respect to the normal of the plane
