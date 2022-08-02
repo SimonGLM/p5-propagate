@@ -25,11 +25,11 @@ class Path {
   show() {
     push()
     colorMode(RGB);
-    let from = color(0, 3, 255, 96)
-    let to = color(145, 254, 21, 96)
+    let from = color(0, 102, 255, 96)
+    let to = color(102, 255, 255, 96)
 
     strokeWeight(2)
-    stroke(lerpColor(from, to, this.pathLength / 2000));
+    stroke(lerpColor(from, to, map(this.pathLength, shortest.pathLength, longest.pathLength, 0, 1)));
     if (this.absorbedBy == 'Wrapping')
       stroke(color(255, 0, 0, 32))
     for (let i = 1; i < this.rays.length; i += 1) {

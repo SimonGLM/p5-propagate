@@ -110,7 +110,7 @@ function sample(N) {
 
 function draw() {
   X0 = slider.value()
-  background(128);
+  background(255);
   textSize(16);
   stroke(0)
   fill(255)

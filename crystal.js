@@ -18,6 +18,6 @@ class Crystal {
     this.walls[0].show();
     this.walls[2].show();
     this.walls[3].show();
-    this.walls[1].show(255, 0, 0, 5);
+    this.walls[1].show(255, 0, 0, 8);
   }
 }

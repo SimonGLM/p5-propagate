@@ -10,7 +10,7 @@ class Boundary {
     this.b = createVector(x2, y2);
   }
 
-  show(R = 255, G = 255, B = 255, weight = 3) {
+  show(R = 0, G = 0, B = 0, weight = 5) {
     push()
     colorMode(RGB, 255)
     stroke(R, G, B)
