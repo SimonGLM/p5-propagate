@@ -4,18 +4,23 @@
 #include "forward_declarations.h"
 #include <vector>
 #include <string>
+#include <memory>
 class path
 {
 public:
     path(const ray &first_ray);
-    void bounce_n(const std::vector<boundary> &f_walls, std::size_t n_bounces);
-    void bounce(const std::vector<boundary> &f_walls);
+    void process(const std::vector<boundary> &f_walls, std::size_t max_bounces = std::numeric_limits<std::size_t>::max(), float max_length = 1e6);
+    auto bounce(const std::vector<boundary> &f_walls) -> bool;
 
-    std::size_t n_bounces();
-    std::string debug_str(std::size_t n_first = 0);
+    auto n_bounces() const -> std::size_t;
+    auto length() const -> float;
+    auto debug_str(std::size_t n_first = 0) const -> std::string;
+    auto termination() const -> std::shared_ptr<boundary>;
 
 private:
-    std::vector<ray> rays;
+    float m_length{0.};
+    std::shared_ptr<boundary> m_termination{nullptr};
+    std::vector<ray> m_rays;
 };
 
 #endif // PATH_H

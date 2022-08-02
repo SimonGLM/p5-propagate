@@ -2,51 +2,73 @@
 #include "ray.h"
 #include "boundary.h"
 #include "world.h"
+#include <memory>
 #include <sstream>
 #include <string>
 #include <vector>
 
 path::path(const ray &first_ray)
-    : rays{{first_ray}} {}
+    : m_rays{{first_ray}} {}
 
-std::size_t path::n_bounces()
+auto path::n_bounces() const -> std::size_t
 {
-    return rays.size() - 1;
+    return m_rays.size() - 1;
 }
 
-std::string path::debug_str(std::size_t n_first)
+auto path::debug_str(std::size_t n_first) const -> std::string
 {
     std::stringstream sstr{};
     sstr << "bounces: " << n_bounces() << "\n";
     if (n_first == 0){
-        n_first = rays.size();
+        n_first = m_rays.size();
     }
     for (auto i = std::size_t{0}; i < n_first; i++){
         sstr << "start:\n"
-             << rays[i].start() << "\ndirection:\n"
-             << rays[i].direction() << "\n";
-        if (rays[i].end() != nullptr)
+             << m_rays[i].start() << "\ndirection:\n"
+             << m_rays[i].direction() << "\n";
+        if (m_rays[i].end() != nullptr)
         {
             sstr << "end:\n"
-                 << *(rays[i].end()) << "\n";
+                 << *(m_rays[i].end()) << "\n";
         }
     }
     return sstr.str();
 }
 
-void path::bounce_n(const std::vector<boundary> &f_walls, std::size_t n_bounces){
-    for (auto i = std::size_t{0}; i < n_bounces; i++){
-        bounce(f_walls);
+auto path::length() const -> float
+{
+    return m_length;
+}
+
+auto path::termination() const -> std::shared_ptr<boundary>
+{
+    return m_termination;
+}
+
+void path::process(const std::vector<boundary> &f_walls, std::size_t max_bounces, float max_length){
+    for (auto i = std::size_t{0}; i < max_bounces; i++){
+        if (!bounce(f_walls) || m_length > max_length){
+            break;
+        }
     }
 }
 
-void path::bounce(const std::vector<boundary> &f_walls)
+auto path::bounce(const std::vector<boundary> &f_walls) -> bool
 {
-    auto intersection = world::find_closest_intersect(rays.back(), f_walls);
+    auto intersection = world::find_closest_intersect(m_rays.back(), f_walls);
     if (intersection.first != invalid_vector){
         auto pt = intersection.first;
         auto wall = intersection.second;
-        rays.back().set_end(pt);
-        rays.push_back(ray{pt, wall.reflect(rays.back()), std::make_shared<boundary>(wall)});
+        m_rays.back().set_end(pt);
+        auto reflected = wall.reflect(m_rays.back());
+        m_length += std::fabs((pt - m_rays.back().start()).norm());
+
+        if (reflected == invalid_vector){
+            m_termination = std::make_shared<boundary>(wall);
+            return false;
+        }
+        m_rays.push_back(ray{pt, std::move(reflected), std::make_shared<boundary>(wall)});
+        return true;
     }
+    return false;
 }

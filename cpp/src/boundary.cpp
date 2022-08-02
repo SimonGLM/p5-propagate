@@ -47,7 +47,7 @@ auto boundary::reflect(const vector2 &vec) -> vector2
 
     // angle in respect to the normal of the plane
     auto angle = std::acos(wall_norm.transpose() * vec) * 180. / M_PI;
-    std::cout << "angle: " << angle << "°\n";
+    // std::cout << "angle: " << angle << "°\n";
 
     // direct reflection due to total reflection
     if (angle > critical_angle)
@@ -55,15 +55,16 @@ auto boundary::reflect(const vector2 &vec) -> vector2
         // be aware that in Eigen, it is only possible to implicitly convert from 1x1 matrix to scalar in one direction (weird)
         return vector2{vec - wall_norm * (2 * (wall_norm.transpose() * vec))};
     }
+    return invalid_vector;
 
     // diffuse reflection due to teflon
-    std::cout << "critical angle: " << critical_angle << "\n";
+    // std::cout << "critical angle: " << critical_angle << "\n";
     auto random_angle = random_float(-critical_angle, critical_angle); // in respect to the normal
 
     Eigen::Rotation2D<float> rotation{random_angle};
-    std::cout << "random angle: " << random_angle << "°\n";
-    std::cout << "new direction:\n"
-              << -(rotation * wall_norm) * std::fabs(vec.norm()) << "\n";
+    // std::cout << "random angle: " << random_angle << "°\n";
+    // std::cout << "new direction:\n"
+    //           << -(rotation * wall_norm) * std::fabs(vec.norm()) << "\n";
     return -(rotation * wall_norm) * std::fabs(vec.norm());
 }
 
@@ -76,5 +77,5 @@ auto boundary::as_line() const -> line
 auto boundary::operator==(boundary &other) -> bool
 {
     // boundaries are equal if their a and b points are equal
-    return (other.a() == m_a && other.b() == m_b);
+    return (other.a().isApprox(m_a, 1e-4) && other.b().isApprox(m_b, 1e-4));
 }

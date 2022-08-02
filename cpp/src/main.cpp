@@ -18,9 +18,7 @@ int main(int argc, char **argv)
     omp_set_num_threads(omp_get_max_threads());
     std::vector<double> times(omp_get_max_threads(), 0.);
 
-    constexpr std::size_t n_bounces{3};
-
-    constexpr std::size_t n_rays{1};
+    constexpr std::size_t n_rays{1000};
 
     // create walls
     float scale = 4.;
@@ -49,9 +47,8 @@ int main(int argc, char **argv)
     {
         // times[thread_id] = start_time();
         auto wtime = omp_get_wtime();
-        int thread_id = omp_get_thread_num();
 
-        paths[i].bounce_n(crystal, n_bounces);
+        paths[i].process(crystal, std::numeric_limits<std::size_t>::max(), 2.5e3);
 
         // times[thread_id] = end_time();
 
@@ -65,9 +62,21 @@ int main(int argc, char **argv)
     // for (auto p : paths){
     //     std::cout << p.n_bounces() << " ";
     // }
+    // std::cout << "\n";
+    // for (auto p : paths){
+    //     std::cout << p.length() << " ";
+    // }
     std::cout << "\n";
-    std::cout << paths[0].debug_str(1);
-    std::cout << std::flush;
+    unsigned hits{};
+    for (auto p : paths){
+        if (p.termination() != nullptr && (*p.termination())==boundary{B,C}){
+            hits++;
+        }
+    }
+    std::cout << hits << " out of " << n_rays << " reached the APD" << std::endl;
+    // std::cout << "\n";
+    // std::cout << paths[0].debug_str(1);
+    // std::cout << std::flush;
 
     // vector2 A{100, 100};
     // vector2 B{-100, 100};
