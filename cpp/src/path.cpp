@@ -14,14 +14,21 @@ std::size_t path::n_bounces()
     return rays.size() - 1;
 }
 
-std::string path::debug_str()
+std::string path::debug_str(std::size_t n_first)
 {
     std::stringstream sstr{};
     sstr << "bounces: " << n_bounces() << "\n";
-    for (auto r : rays){
-        sstr << "start:\n" << r.start() << "\ndirection:\n" << r.direction() << "\n";
-        if (r.end() != nullptr){
-             sstr << "end:\n" << *(r.end()) << "\n";
+    if (n_first == 0){
+        n_first = rays.size();
+    }
+    for (auto i = std::size_t{0}; i < n_first; i++){
+        sstr << "start:\n"
+             << rays[i].start() << "\ndirection:\n"
+             << rays[i].direction() << "\n";
+        if (rays[i].end() != nullptr)
+        {
+            sstr << "end:\n"
+                 << *(rays[i].end()) << "\n";
         }
     }
     return sstr.str();

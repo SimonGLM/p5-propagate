@@ -12,7 +12,7 @@ public:
     void bounce(const std::vector<boundary> &f_walls);
 
     std::size_t n_bounces();
-    std::string debug_str();
+    std::string debug_str(std::size_t n_first = 0);
 
 private:
     std::vector<ray> rays;
