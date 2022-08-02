@@ -5,10 +5,41 @@
 #include "path.h"
 #include "world.h"
 #include <Eigen/Dense>
+#include <fstream>
 #include <vector>
 #include <iostream>
+#include <iomanip>
 #include <omp.h>
 
+int parseLine(char *line)
+{
+    // This assumes that a digit will be found and the line ends in " Kb".
+    int i = strlen(line);
+    const char *p = line;
+    while (*p < '0' || *p > '9')
+        p++;
+    line[i - 3] = '\0';
+    i = atoi(p);
+    return i;
+}
+
+int getMemoryUsage()
+{ // Note: this value is in KB!
+    FILE *file = fopen("/proc/self/status", "r");
+    int result = -1;
+    char line[128];
+
+    while (fgets(line, 128, file) != NULL)
+    {
+        if (strncmp(line, "VmSize:", 7) == 0)
+        {
+            result = parseLine(line);
+            break;
+        }
+    }
+    fclose(file);
+    return result;
+}
 
 int main(int argc, char **argv)
 {
@@ -18,13 +49,13 @@ int main(int argc, char **argv)
     omp_set_num_threads(omp_get_max_threads());
     std::vector<double> times(omp_get_max_threads(), 0.);
 
-    constexpr std::size_t n_rays{1};
+    constexpr std::size_t n_rays{1000000};
 
     // create walls
-    float scale{4.};
+    float scale{1.};
     float BF{21.28};
     float BR{28.75};
-    vector2 A{100 * scale, (BF - BR / 2)  * scale};
+    vector2 A{100 * scale, (BF - BR / 2) * scale};
     vector2 B{-100 * scale, BR / 2 * scale};
     vector2 C{-100 * scale, -BR / 2 * scale};
     vector2 D{100 * scale, -BR / 2 * scale};
@@ -33,14 +64,17 @@ int main(int argc, char **argv)
                                    boundary{B, C, true},
                                    boundary{C, D},
                                    boundary{D, A}}};
-    for (auto b : crystal){
-        std::cout << "normal:\n" << b.normal() << "\n";
+    for (auto b : crystal)
+    {
+        std::cout << "normal:\n"
+                  << b.normal() << "\n";
     }
 
     std::vector<path> paths{};
-    for (auto i = std::size_t{0}; i < n_rays; i++){
-        paths.push_back(path{ray{vector2{0, 0}, static_cast<float>(135.)}});
-        // paths.push_back(path{ray{vector2{0, 0}, static_cast<float>(i / static_cast<float>(n_rays) * 360.)}});
+    for (auto i = std::size_t{0}; i < n_rays; i++)
+    {
+        // paths.push_back(path{ray{vector2{0, 0}, static_cast<float>(135.)}});
+        paths.push_back(path{ray{vector2{0, 0}, static_cast<float>(i / static_cast<float>(n_rays) * 360.)}});
     }
 
 #pragma omp parallel for
@@ -56,19 +90,33 @@ int main(int argc, char **argv)
         wtime = omp_get_wtime() - wtime;
         times[omp_get_thread_num()] += wtime;
     }
-    for (auto i = std::size_t{0}; i < omp_get_max_threads(); i++){
-        std::cout << "Thread " << i << " " << static_cast<int>(times[i]*1e6) << " µs\n";
+    for (auto i = std::size_t{0}; i < omp_get_max_threads(); i++)
+    {
+        std::cout << "Thread " << i << " " << static_cast<int>(times[i] * 1e6) << " µs\n";
     }
 
     std::cout << "\n";
     unsigned hits{};
-    for (auto p : paths){
-        if (p.termination() != nullptr && (*p.termination())==boundary{B,C}){
+    for (auto p : paths)
+    {
+        if (p.termination() != nullptr && (*p.termination()) == boundary{B, C})
+        {
             hits++;
         }
-        std::cout << p.debug_str(std::numeric_limits<std::size_t>::max());
+        // std::cout << p.debug_str(std::numeric_limits<std::size_t>::max());
     }
-    std::cout << hits << " out of " << n_rays << " reached the APD" << std::endl;
+
+    std::ofstream out_stream("data.csv");
+    out_stream << "length hit_apd\n";
+    for (auto p : paths)
+    {
+        out_stream << std::setprecision(7) << p.length() << " " << (p.termination() != nullptr && *(p.termination()) == boundary{B, C}) << "\n";
+    }
+    out_stream.close();
+
+    std::cout << hits << " out of " << n_rays << " reached the APD. Light collection efficiency: " << hits / static_cast<float>(n_rays) << std::endl;
+
+    std::cout << getMemoryUsage() / 1024 << " MB RAM was used total\n";
     // std::cout << "\n";
     // std::cout << paths[0].debug_str(1);
     // std::cout << std::flush;

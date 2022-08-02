@@ -26,7 +26,6 @@ private:
     vector2 m_a;
     vector2 m_b;
     bool m_is_absorbing;
-
     // angle in degrees under which total reflection occurs
     inline static const double critical_angle{std::asin(1.000293/2.2)};
 };

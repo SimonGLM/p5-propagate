@@ -12,8 +12,8 @@ auto det(vector2 v1, vector2 v2) -> float{
     return v1[0]*v2[1] - v1[1]*v2[0];
 }
 
-path::path(const ray &first_ray)
-    : m_rays{{first_ray}} {}
+path::path(const ray &first_ray, bool f_keep_all_rays)
+    : m_rays{{first_ray}}, m_keep_all_rays{f_keep_all_rays} {}
 
 auto path::n_bounces() const -> std::size_t
 {
@@ -74,6 +74,9 @@ auto path::bounce(const std::vector<boundary> &f_walls) -> bool
             return false;
         }
         m_rays.push_back(ray{pt, std::move(reflected), std::make_shared<boundary>(wall)});
+        if (!m_keep_all_rays){
+            m_rays.pop_front();
+        }
         return true;
     }
     return false;

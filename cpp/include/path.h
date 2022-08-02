@@ -3,12 +3,13 @@
 
 #include "forward_declarations.h"
 #include <vector>
+#include <deque>
 #include <string>
 #include <memory>
 class path
 {
 public:
-    path(const ray &first_ray);
+    path(const ray &first_ray, bool f_keep_all_rays = false);
     void process(const std::vector<boundary> &f_walls, std::size_t max_bounces = std::numeric_limits<std::size_t>::max(), float max_length = 1e6);
     auto bounce(const std::vector<boundary> &f_walls) -> bool;
 
@@ -20,7 +21,8 @@ public:
 private:
     float m_length{0.};
     std::shared_ptr<boundary> m_termination{nullptr};
-    std::vector<ray> m_rays;
+    std::deque<ray> m_rays;
+    bool m_keep_all_rays;
 };
 
 #endif // PATH_H
