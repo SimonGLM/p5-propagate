@@ -9,7 +9,7 @@
 boundary::boundary(const vector2 &f_a, const vector2 &f_b)
     : m_a{std::move(f_a)}, m_b{std::move(f_b)} {}
 
-auto boundary::normal() -> vector2
+auto boundary::normal() const -> vector2
 {
     auto rot_90_deg = Eigen::Matrix2f{
         {0, -1},

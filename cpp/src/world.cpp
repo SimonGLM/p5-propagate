@@ -42,15 +42,14 @@ auto world::intersect(const ray &f_ray, const boundary &wall) -> vector2
     auto pt = f_ray.as_line().intersection(wall.as_line());
     // check if it is the same line and throw away if it is?
 
+
+    std::cout << "\n" << pt << "\n";
     // check if point is inside wall boundaries and in forward direction of the ray
     bool valid_intersect = true;
-    auto ray_vec = pt - f_ray.start();
-    if (f_ray.direction()[0] != 0 && ray_vec[0]/f_ray.direction()[0] < 0){
+    if (wall.normal().transpose() * (f_ray.start() - pt) > 0){
         valid_intersect = false;
     }
-    if (f_ray.direction()[1] != 0 && ray_vec[1]/f_ray.direction()[1] < 0){
-        valid_intersect = false;
-    }
+
     if ((wall.b() - pt).normalized() != (pt - wall.a()).normalized())
     {
         valid_intersect = false;

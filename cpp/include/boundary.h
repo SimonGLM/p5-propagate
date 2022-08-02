@@ -9,7 +9,7 @@ class boundary
 {
 public:
     boundary(const vector2 &f_a, const vector2 &f_b);
-    auto normal() -> vector2;
+    auto normal() const -> vector2;
 
     auto reflect(const ray &inc_ray) -> vector2;
     auto reflect(const vector2 &vec) -> vector2;
