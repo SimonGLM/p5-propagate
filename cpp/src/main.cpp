@@ -16,11 +16,11 @@ int main(int argc, char **argv)
 
     std::cout << "OMP threads: " << omp_get_max_threads() << "\n";
     omp_set_num_threads(omp_get_max_threads());
-    std::vector<unsigned long> times(omp_get_max_threads(), 0);
+    std::vector<double> times(omp_get_max_threads(), 0.);
 
-    constexpr std::size_t n_bounces{100};
+    constexpr std::size_t n_bounces{3};
 
-    constexpr std::size_t n_rays{360};
+    constexpr std::size_t n_rays{1};
 
     // create walls
     float scale = 4.;
@@ -31,10 +31,6 @@ int main(int argc, char **argv)
     vector2 C{-100 * scale, -BR / 2 * scale};
     vector2 D{100 * scale, BF - BR / 2 * scale};
 
-    // vector2 A{100, 100};
-    // vector2 B{-100, 100};
-    // vector2 C{-100, -100};
-    // vector2 D{100, -100};
     std::vector<boundary> crystal{{boundary{A, B},
                                    boundary{B, C},
                                    boundary{C, D},
@@ -42,25 +38,28 @@ int main(int argc, char **argv)
     for (auto b : crystal){
         std::cout << "normal:\n" << b.normal() << "\n";
     }
-    vector2 interaction_pt{0,0};
+
     std::vector<path> paths{};
-
-    // paths.push_back(path{ray{interaction_pt, static_cast<float>(2)}});
-
     for (auto i = std::size_t{0}; i < n_rays; i++){
-        paths.push_back(path{ray{interaction_pt, static_cast<float>(i)}});
+        paths.push_back(path{ray{vector2{0, 0}, static_cast<float>(i / static_cast<float>(n_rays) * 360.)}});
     }
-    // p.append(new Ray(createVector((0 - 100) * scale, 0), p5.Vector.fromAngle(radians(a / nRays * 360))));
 
 #pragma omp parallel for
     for (auto i = std::size_t{0}; i < n_rays; i++)
     {
-        int thread_id = omp_get_thread_num();
         // times[thread_id] = start_time();
+        auto wtime = omp_get_wtime();
+        int thread_id = omp_get_thread_num();
 
         paths[i].bounce_n(crystal, n_bounces);
 
         // times[thread_id] = end_time();
+
+        wtime = omp_get_wtime() - wtime;
+        times[omp_get_thread_num()] += wtime;
+    }
+    for (auto i = std::size_t{0}; i < omp_get_max_threads(); i++){
+        std::cout << "Thread " << i << " " << static_cast<int>(times[i]*1e6) << " µs\n";
     }
 
     // for (auto p : paths){

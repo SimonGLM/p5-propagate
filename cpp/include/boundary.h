@@ -4,6 +4,7 @@
 #include "forward_declarations.h"
 #include "aliases.h"
 #include <Eigen/Dense>
+#include <cmath>
 
 class boundary
 {
@@ -24,6 +25,9 @@ public:
 private:
     vector2 m_a;
     vector2 m_b;
+
+    // angle in degrees under which total reflection occurs
+    inline static const double critical_angle{std::asin(1.000293/2.2)};
 };
 
 #endif // BOUNDARY_H

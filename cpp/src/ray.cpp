@@ -3,6 +3,7 @@
 #include <limits>
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
+#include <cmath>
 
 ray::ray(const vector2 &f_start, const vector2 &f_direction, std::shared_ptr<boundary> f_last_bounce)
     : m_start{std::move(f_start)}, m_direction{std::move(f_direction)}, m_last_bounce{f_last_bounce} {}
@@ -10,7 +11,7 @@ ray::ray(const vector2 &f_start, const vector2 &f_direction, std::shared_ptr<bou
 ray::ray(const vector2 &f_start, float angle, std::shared_ptr<boundary> f_last_bounce)
     : m_start{std::move(f_start)}, m_last_bounce{f_last_bounce}
 {
-    Eigen::Rotation2D<float> rotation{angle};
+    Eigen::Rotation2D<float> rotation{angle * (M_PI / 180)};
     vector2 f_direction{0, 1};
     m_direction = rotation * f_direction;
 }

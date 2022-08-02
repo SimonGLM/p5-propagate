@@ -5,6 +5,15 @@
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
 #include <iostream>
+#include <cmath>
+
+float random_float(float a, float b)
+{
+    float random = (static_cast<float>(rand())) / static_cast<float>(RAND_MAX);
+    float diff = b - a;
+    float r = random * diff;
+    return a + r;
+}
 
 boundary::boundary(const vector2 &f_a, const vector2 &f_b)
     : m_a{std::move(f_a)}, m_b{std::move(f_b)} {}
@@ -36,10 +45,26 @@ auto boundary::reflect(const vector2 &vec) -> vector2
 {
     auto wall_norm = normal();
 
-    vector2 ref{vec - wall_norm * (2 * (wall_norm.transpose() * vec))};
+    // angle in respect to the normal of the plane
+    auto angle = std::acos(wall_norm.transpose() * vec) * 180. / M_PI;
+    std::cout << "angle: " << angle << "°\n";
 
-    // be aware that in Eigen, it is only possible to implicitly convert from 1x1 matrix to scalar in one direction (weird)
-    return ref;
+    // direct reflection due to total reflection
+    if (angle > critical_angle)
+    {
+        // be aware that in Eigen, it is only possible to implicitly convert from 1x1 matrix to scalar in one direction (weird)
+        return vector2{vec - wall_norm * (2 * (wall_norm.transpose() * vec))};
+    }
+
+    // diffuse reflection due to teflon
+    std::cout << "critical angle: " << critical_angle << "\n";
+    auto random_angle = random_float(-critical_angle, critical_angle); // in respect to the normal
+
+    Eigen::Rotation2D<float> rotation{random_angle};
+    std::cout << "random angle: " << random_angle << "°\n";
+    std::cout << "new direction:\n"
+              << -(rotation * wall_norm) * std::fabs(vec.norm()) << "\n";
+    return -(rotation * wall_norm) * std::fabs(vec.norm());
 }
 
 auto boundary::as_line() const -> line
