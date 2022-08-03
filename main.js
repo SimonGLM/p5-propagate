@@ -1,8 +1,13 @@
+// p5-propagate
+// Light propagation simulation to quantify light yield non-linearities
+// in PANDA EMC Barrel Type-1 crystals.
+// This simulation ignores partial reflection for angles below critical and ignores scattering from the wrapping back into the crystal.
+
+// Heavily inspired and derived from:
 // Daniel Shiffman
 // https://thecodingtrain.com/CodingChallenges/145-2d-ray-casting.html
 // https://youtu.be/TOEi6T2mtHo
 
-// 2D Ray Casting
 
 let crystal;
 let X0 = 100;

@@ -1,9 +1,3 @@
-// Daniel Shiffman
-// https://thecodingtrain.com/CodingChallenges/145-2d-ray-casting.html
-// https://youtu.be/TOEi6T2mtHo
-
-// 2D Ray Casting
-
 class Boundary {
   constructor(x1, y1, x2, y2) {
     this.a = createVector(x1, y1);
